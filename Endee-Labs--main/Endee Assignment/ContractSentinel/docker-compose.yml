@@ -1,0 +1,110 @@
+version: '3.8'
+
+services:
+  # ---------------------------------------------------------------------------
+  # Endee Vector Database
+  # ---------------------------------------------------------------------------
+  # NOTE: Image name must be verified. Assuming 'endeelabs/endee:latest' or similar 
+  # based on search results. If local build is needed, uncomment 'build' section.
+  endee:
+    image: endeelabs/endee:latest
+    container_name: endee_vector_db
+    ports:
+      - "8080:8080" # HTTP API
+      - "50051:50051" # gRPC API (if applicable)
+    volumes:
+      - endee_data:/var/lib/endee
+    environment:
+      - ENDEE_LOG_LEVEL=info
+    networks:
+      - sentinel_net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # ---------------------------------------------------------------------------
+  # Backend API (FastAPI + Agent)
+  # ---------------------------------------------------------------------------
+  backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backend
+    container_name: sentinel_backend
+    volumes:
+      - ./backend:/app/backend
+      - ./scripts:/app/scripts
+    ports:
+      - "8000:8000"
+    environment:
+      - ENDEE_HOST=endee
+      - ENDEE_PORT=8080
+      - POSTGRES_HOST=postgres
+      - OPENAI_API_KEY=${OPENAI_API_KEY} # If using cloud LLM
+    depends_on:
+      - endee
+      - postgres
+    networks:
+      - sentinel_net
+    command: uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # ---------------------------------------------------------------------------
+  # Frontend (Streamlit)
+  # ---------------------------------------------------------------------------
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.frontend
+    container_name: sentinel_frontend
+    volumes:
+      - ./frontend:/app/frontend
+    ports:
+      - "8501:8501"
+    environment:
+      - BACKEND_URL=http://backend:8000
+    depends_on:
+      - backend
+    networks:
+      - sentinel_net
+    command: streamlit run frontend/app.py
+
+  # ---------------------------------------------------------------------------
+  # Metadata Storage (PostgreSQL)
+  # ---------------------------------------------------------------------------
+  postgres:
+    image: postgres:15-alpine
+    container_name: sentinel_db
+    environment:
+      POSTGRES_USER: sentinel
+      POSTGRES_PASSWORD: sentinel_password
+      POSTGRES_DB: sentinel_meta
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - sentinel_net
+
+  # ---------------------------------------------------------------------------
+  # Optional: Local LLM (Ollama)
+  # Uncomment if running purely local 
+  # ---------------------------------------------------------------------------
+  # ollama:
+  #   image: ollama/ollama:latest
+  #   container_name: ollama_llm
+  #   volumes:
+  #     - ollama_data:/root/.ollama
+  #   ports:
+  #     - "11434:11434"
+  #   networks:
+  #     - sentinel_net
+
+volumes:
+  endee_data:
+  postgres_data:
+  ollama_data:
+
+networks:
+  sentinel_net:
+    driver: bridge
