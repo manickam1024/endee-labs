@@ -1,160 +1,133 @@
-⚖️ ClauseGuardian: Intelligent Legal Risk Review Agent
+# ⚖️ ClauseGuard AI: Autonomous Legal Risk Intelligence Platform
 
+![Vector Engine](https://img.shields.io/badge/Vector%20Engine-High%20Recall-purple) ![Autonomous AI](https://img.shields.io/badge/AI-Reasoning%20Agent-orange) ![Python Stack](https://img.shields.io/badge/Stack-FastAPI%20%7C%20Streamlit-blue)
 
+**ClauseGuard AI** is an autonomous contract analysis agent built to modernize legal document review. Rather than relying on surface-level keyword search or generic RAG pipelines, ClauseGuard applies **multi-step agent reasoning** combined with a **high-recall vector engine** to deeply interpret, retrieve, and evaluate legally sensitive clauses.
 
+---
 
+## 🚀 Problem Overview
 
+Legal professionals invest extensive time reviewing NDAs, MSAs, SaaS agreements, and vendor contracts. A single overlooked clause — such as disproportionate indemnification or unlimited liability — can expose organizations to major financial and legal risks.
 
-ClauseGuardian is an autonomous legal analysis assistant built to modernize contract risk assessment. Rather than relying on surface-level keyword matching or basic retrieval-augmented chat systems, it applies structured agent reasoning combined with high-recall semantic search to detect, evaluate, and contextualize contractual risk.
+### 🔎 The Core Issue
 
-🚀 The Core Problem
+* Traditional keyword search misses conceptually similar clauses when wording differs.
+* Many RAG-based systems retrieve loosely relevant passages or hallucinate interpretations.
+* Approximate search techniques may sacrifice recall — unacceptable in legal contexts.
 
-Legal professionals invest enormous time reviewing contracts such as NDAs, MSAs, and vendor agreements. Overlooking a single asymmetric indemnity clause or an unlimited liability provision can expose organizations to significant financial and operational risk.
+### 💡 The Approach
 
-Why Traditional Tools Fall Short
+ClauseGuard AI ensures:
 
-Keyword search fails when clauses are written using alternative phrasing.
+* **High-fidelity semantic retrieval** for critical legal concepts
+* **Stepwise reasoning workflows** (e.g., Liability → Indemnity → Termination → Compare to Policy)
+* **Policy-driven risk scoring** aligned with internal legal playbooks
 
-Basic RAG systems may retrieve loosely related sections or fabricate context.
+---
 
-Approximate search engines can sacrifice retrieval accuracy for speed.
+## 🏗️ System Architecture
 
-In legal review, precision and recall are non-negotiable.
+```mermaid
+graph TD
+    User[Legal Reviewer] -->|Uploads Contract| UI[Streamlit Interface]
+    UI -->|Send File| Backend[FastAPI Service]
 
-The Approach
+    subgraph "Autonomous Reasoning Layer"
+        Backend -->|Trigger Analysis| Agent[Reasoning Controller]
+        Agent -->|Plan & Execute| Toolset[Analysis Tools]
+        Toolset -->|Clause Retrieval| VectorDB[High-Recall Vector Engine]
+        Toolset -->|Policy Validation| PolicyEngine[Risk Policy Module]
+    end
 
-ClauseGuardian combines:
+    subgraph "Document Processing Pipeline"
+        Backend -->|Parse & Split| Splitter[Semantic Chunk Processor]
+        Splitter -->|Generate Embeddings| EmbeddingModel[BGE-M3 Encoder]
+        EmbeddingModel -->|Store Vectors| VectorDB
+    end
 
-High-Recall Semantic Retrieval
-A vector database optimized for recall ensures critical clauses are retrieved even when phrased differently. This prevents important provisions from being overlooked due to wording variations.
+    VectorDB -->|Relevant Context| Agent
+    Agent -->|Structured Risk Report| User
+```
 
-Agent-Based Reasoning Engine
-Instead of answering in one step, the system follows a structured reasoning path:
+---
 
-Identify relevant clause categories
+## 🔧 Technology Stack
 
-Retrieve supporting contract sections
+* **Vector Retrieval Engine:** High-Recall Vector Graph Engine
+* **Reasoning Framework:** Custom ReAct-style State Machine (Python)
+* **Backend API:** FastAPI + Pydantic
+* **Frontend Interface:** Streamlit
+* **Embeddings Model:** BAAI/bge-m3 (SentenceTransformers)
+* **LLM Compatibility:** OpenAI GPT-4 or Llama 3 (via Ollama)
 
-Evaluate clause language against predefined risk criteria
+---
 
-Generate a contextual risk explanation
+## 🏃‍♂️ Setup & Execution
 
-Rule-Driven Risk Benchmarking
-Extracted clauses are compared against internal legal playbooks or policy thresholds (e.g., liability caps, indemnification symmetry, termination rights).
+### 📌 Requirements
 
-This layered workflow mimics how experienced legal professionals review contracts — systematically and contextually.
+* Docker & Docker Compose
+* Python 3.10+ (if running without containers)
 
-🏗️ System Architecture
+---
 
-User uploads contract (PDF)
-↓
-Frontend Interface (Streamlit)
-↓
-FastAPI Backend
-↓
-Agentic Core
+### 1️⃣ Clone and Configure
 
-Reasoning Agent
-
-Tool Set (Vector Search + Risk Rule Engine)
-↓
-High-Recall Vector Database
-↓
-Contextual Risk Analysis Returned to User
-
-Data Pipeline:
-
-Document ingestion
-
-Recursive semantic chunking
-
-Embedding generation (BGE-M3)
-
-Vector storage in database
-
-🔧 Technology Stack
-
-Vector Database: Endee
-
-Agent Framework: Custom ReAct-style state machine (Python)
-
-Backend: FastAPI with Pydantic
-
-Frontend: Streamlit
-
-Embeddings: BAAI/bge-m3 via SentenceTransformers
-
-LLM Compatibility: Llama 3 (Ollama) or GPT-4
-
-🏃 How to Run
-
-Prerequisites:
-
-Docker and Docker Compose
-
-Python 3.10+ (if running without Docker)
-
-Setup Steps:
-
-Clone the repository
-git clone https://github.com/yourusername/ContractSentinel.git
-
-cd ContractSentinel
+```bash
+git clone https://github.com/yourusername/ClauseGuard-AI.git
+cd ClauseGuard-AI
 cp .env.example .env
+```
 
-Start services with Docker
+> Ensure the vector engine image in `docker-compose.yml` matches the latest official build if updates were released.
+
+---
+
+### 2️⃣ Launch via Docker (Recommended)
+
+```bash
 docker-compose up --build
+```
 
-Services will launch at:
+This will initialize:
 
-Vector Database: localhost:8080
+* **Vector Engine** → [http://localhost:8080](http://localhost:8080)
+* **Backend API** → [http://localhost:8000](http://localhost:8000)
+* **Frontend Dashboard** → [http://localhost:8501](http://localhost:8501)
 
-Backend API: localhost:8000
+---
 
-Frontend UI: localhost:8501
+### 3️⃣ How to Use
 
-Usage:
+1. Open [http://localhost:8501](http://localhost:8501)
+2. Upload a contract document (e.g., NDA or MSA)
+3. Click **Process Document**
+4. Ask questions such as:
 
-Open http://localhost:8501
+   * “Is indemnification mutual?”
+   * “What are the liability limitations?”
+   * “Does this agreement allow termination without cause?”
 
-Upload a contract PDF
+---
 
-Click “Ingest Document”
+## 🧠 Why a High-Recall Vector Engine?
 
-Ask questions such as:
+In legal review systems, **missing information is worse than slow retrieval**.
 
-Does this agreement include mutual indemnification?
+* Many databases prioritize speed using Approximate Nearest Neighbor (ANN) methods.
+* Legal AI requires maximum recall to ensure no relevant clause is overlooked.
+* A vector graph-based retrieval approach enhances semantic coverage while remaining memory-efficient — making it suitable for private, on-premise deployments where data sensitivity is critical.
 
-What is the liability cap?
+---
 
-Can either party terminate for convenience?
+## 🔮 Planned Enhancements
 
-🧠 Why This Vector Database Choice Matters
+* **Graph-Augmented Retrieval (GraphRAG):** Track relationships across entities, subsidiaries, and obligations.
+* **Vision Integration:** Extract clauses from scanned contracts and embedded tables using VLMs.
+* **Continuous Contract Monitoring:** Automatically evaluate legal text changes in version control systems.
+* **Comparative Clause Benchmarking:** Compare uploaded contracts against historical agreements.
 
-In legal AI, retrieval accuracy is more important than raw speed.
+---
 
-Many vector systems rely heavily on approximate nearest neighbor search, which may skip relevant clauses to optimize performance.
-
-The selected vector engine focuses on:
-
-High recall for sensitive legal text
-
-Lower memory consumption
-
-Suitability for on-premise deployment
-
-Strong performance for compliance-sensitive environments
-
-When reviewing contracts, missing a clause is not acceptable.
-
-🔮 Future Roadmap
-
-Graph-Enhanced Retrieval (GraphRAG) to track entity relationships
-
-Multi-modal support for scanned PDFs and tables
-
-Automated risk checks integrated into CI/CD pipelines
-
-Version comparison for contract redlines
-
-Risk scoring dashboard with historical analytics
+ClauseGuard AI aims to function not merely as a search assistant — but as a structured legal reasoning partner that helps reduce contractual risk before it becomes a liability.
